@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">AppGitHub</string>
+
+    <string name="user_avatar_description">User avatar</string>
+    <string name="repository_counter_title">Repositories:</string>
+    <string name="followers_counter_title">Followers:</string>
+    <string name="following_counter_title">Following:</string>
 </resources>
