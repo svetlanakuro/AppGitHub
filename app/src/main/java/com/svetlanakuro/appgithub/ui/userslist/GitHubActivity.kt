@@ -5,6 +5,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import com.svetlanakuro.appgithub.data.MockUsersRepoImpl
+import com.svetlanakuro.appgithub.data.database.RetrofitUsersRepoImpl
 import com.svetlanakuro.appgithub.databinding.ActivityGitHubBinding
 import com.svetlanakuro.appgithub.domain.UsersRepo
 
@@ -12,7 +13,7 @@ class GitHubActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityGitHubBinding
     private val adapter = GitUsersAdapter()
-    private val usersRepo: UsersRepo = MockUsersRepoImpl()
+    private val usersRepo: UsersRepo = RetrofitUsersRepoImpl()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
