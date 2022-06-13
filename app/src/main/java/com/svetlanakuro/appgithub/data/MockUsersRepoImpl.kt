@@ -1,6 +1,10 @@
 package com.svetlanakuro.appgithub.data
 
+import android.os.*
+import com.svetlanakuro.appgithub.domain.UsersRepo
 import com.svetlanakuro.appgithub.domain.entities.*
+
+private const val DATA_LOADING_FAKE_DELAY = 2_000L
 
 class MockUsersRepoImpl : UsersRepo {
 
@@ -68,18 +72,24 @@ class MockUsersRepoImpl : UsersRepo {
         ),
     )
 
-    override fun getUsersList(): List<GitUserEntity> {
-        return mockListUsers
+    override fun getUsers(onSuccess: (List<GitUserEntity>) -> Unit, onError: ((Throwable) -> Unit)?) {
+        Handler(Looper.getMainLooper()).postDelayed({
+            onSuccess(mockListUsers)
+        }, DATA_LOADING_FAKE_DELAY)
     }
 
-    override fun getProjectsUser(login: String): List<GitProjectsEntity> {
-        var userProjects: List<GitProjectsEntity> = emptyList()
-        mockListUsers.forEach { user ->
-            if (user.login == login) {
-                userProjects = user.projectsList
-            }
-        }
-        return userProjects
-    }
+//    override fun getUsersList(): List<GitUserEntity> {
+//        return mockListUsers
+//    }
+//
+//    override fun getProjectsUser(login: String): List<GitProjectsEntity> {
+//        var userProjects: List<GitProjectsEntity> = emptyList()
+//        mockListUsers.forEach { user ->
+//            if (user.login == login) {
+//                userProjects = user.projectsList!!
+//            }
+//        }
+//        return userProjects
+//    }
 
 }

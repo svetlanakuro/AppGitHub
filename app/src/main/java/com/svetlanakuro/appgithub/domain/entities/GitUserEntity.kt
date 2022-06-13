@@ -15,5 +15,5 @@ data class GitUserEntity(
     val publicRepos: Int,
     val followers: Int,
     val following: Int,
-    val projectsList: List<GitProjectsEntity>
+    val projectsList: List<GitProjectsEntity>? = null
 ) : Parcelable
