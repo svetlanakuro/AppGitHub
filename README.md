@@ -22,6 +22,7 @@ ____
 
 - ViewBinding;
 - Retrofit;
-- Coil.
+- Gson;
+- Picasso.
 
 ____
