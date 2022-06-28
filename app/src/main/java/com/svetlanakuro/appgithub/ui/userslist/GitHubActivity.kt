@@ -4,15 +4,16 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
-import com.svetlanakuro.appgithub.data.MockUsersRepoImpl
+import com.svetlanakuro.appgithub.app
 import com.svetlanakuro.appgithub.databinding.ActivityGitHubBinding
-import com.svetlanakuro.appgithub.domain.UsersRepo
+import com.svetlanakuro.appgithub.domain.entities.GitUserEntity
 
-class GitHubActivity : AppCompatActivity() {
+class GitHubActivity : AppCompatActivity(), GitUsersContract.View {
 
     private lateinit var binding: ActivityGitHubBinding
     private val adapter = GitUsersAdapter()
-    private val usersRepo: UsersRepo = MockUsersRepoImpl()
+
+    private lateinit var presenter: GitUsersContract.Presenter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -21,23 +22,33 @@ class GitHubActivity : AppCompatActivity() {
 
         showProgress(true)
 
-        usersRepo.getUsers(onSuccess = {
-            showProgress(false)
-            adapter.setData(it)
-        }, onError = {
-            showProgress(false)
-            Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
-        })
+        presenter = GitUsersPresenter(app.usersRepo)
+        presenter.onRefresh()
 
         initRecyclerView()
+
+        presenter.attach(this)
     }
 
     private fun initRecyclerView() {
         binding.usersListRecyclerView.adapter = adapter
     }
 
-    private fun showProgress(inProgress: Boolean) {
+    override fun showUsers(users: List<GitUserEntity>) {
+        adapter.setData(users)
+    }
+
+    override fun showError(throwable: Throwable) {
+        Toast.makeText(this, throwable.message, Toast.LENGTH_SHORT).show()
+    }
+
+    override fun showProgress(inProgress: Boolean) {
         binding.progressBar.isVisible = inProgress
         binding.usersListRecyclerView.isVisible = !inProgress
+    }
+
+    override fun onDestroy() {
+        presenter.detach()
+        super.onDestroy()
     }
 }
