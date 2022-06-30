@@ -8,12 +8,12 @@ import com.svetlanakuro.appgithub.app
 import com.svetlanakuro.appgithub.databinding.ActivityGitHubBinding
 import com.svetlanakuro.appgithub.domain.entities.GitUserEntity
 
-class GitHubActivity : AppCompatActivity(), GitUsersContract.View {
+class GitHubActivity : AppCompatActivity(), UsersContract.View {
 
     private lateinit var binding: ActivityGitHubBinding
-    private val adapter = GitUsersAdapter()
+    private val adapter = UsersAdapter()
 
-    private lateinit var presenter: GitUsersContract.Presenter
+    private lateinit var presenter: UsersContract.Presenter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,12 +22,17 @@ class GitHubActivity : AppCompatActivity(), GitUsersContract.View {
 
         showProgress(true)
 
-        presenter = GitUsersPresenter(app.usersRepo)
+        presenter = extractPresenter()
+        presenter = UsersPresenter(app.usersRepo)
         presenter.onRefresh()
 
         initRecyclerView()
 
         presenter.attach(this)
+    }
+
+    private fun extractPresenter(): UsersContract.Presenter {
+        return lastCustomNonConfigurationInstance as? UsersContract.Presenter ?: UsersPresenter(app.usersRepo)
     }
 
     private fun initRecyclerView() {
@@ -45,6 +50,11 @@ class GitHubActivity : AppCompatActivity(), GitUsersContract.View {
     override fun showProgress(inProgress: Boolean) {
         binding.progressBar.isVisible = inProgress
         binding.usersListRecyclerView.isVisible = !inProgress
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onRetainCustomNonConfigurationInstance(): UsersContract.Presenter {
+        return presenter
     }
 
     override fun onDestroy() {

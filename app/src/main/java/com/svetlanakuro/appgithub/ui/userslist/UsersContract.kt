@@ -2,7 +2,7 @@ package com.svetlanakuro.appgithub.ui.userslist
 
 import com.svetlanakuro.appgithub.domain.entities.GitUserEntity
 
-interface GitUsersContract {
+interface UsersContract {
 
     interface View {
 
