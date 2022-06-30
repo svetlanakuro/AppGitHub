@@ -1,5 +1,6 @@
 package com.svetlanakuro.appgithub.ui.userslist
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -7,6 +8,9 @@ import androidx.core.view.isVisible
 import com.svetlanakuro.appgithub.app
 import com.svetlanakuro.appgithub.databinding.ActivityGitHubBinding
 import com.svetlanakuro.appgithub.domain.entities.GitUserEntity
+import com.svetlanakuro.appgithub.ui.userprofile.ProfileActivity
+
+const val EXTRA_DATA = "USER_DATA"
 
 class GitHubActivity : AppCompatActivity(), UsersContract.View {
 
@@ -27,6 +31,8 @@ class GitHubActivity : AppCompatActivity(), UsersContract.View {
         presenter.onRefresh()
 
         initRecyclerView()
+
+        initActon()
 
         presenter.attach(this)
     }
@@ -50,6 +56,15 @@ class GitHubActivity : AppCompatActivity(), UsersContract.View {
     override fun showProgress(inProgress: Boolean) {
         binding.progressBar.isVisible = inProgress
         binding.usersListRecyclerView.isVisible = !inProgress
+    }
+
+    private fun initActon() {
+        adapter.listenerClick = UsersAdapter.OnUserClickListener { user ->
+            val intent = Intent(this, ProfileActivity::class.java).apply {
+                putExtra(EXTRA_DATA, user)
+            }
+            startActivity(intent)
+        }
     }
 
     @Deprecated("Deprecated in Java")
