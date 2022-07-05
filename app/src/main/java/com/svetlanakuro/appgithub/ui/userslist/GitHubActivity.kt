@@ -1,18 +1,23 @@
 package com.svetlanakuro.appgithub.ui.userslist
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
-import com.svetlanakuro.appgithub.data.MockUsersRepoImpl
+import com.svetlanakuro.appgithub.app
 import com.svetlanakuro.appgithub.databinding.ActivityGitHubBinding
-import com.svetlanakuro.appgithub.domain.UsersRepo
+import com.svetlanakuro.appgithub.domain.entities.GitUserEntity
+import com.svetlanakuro.appgithub.ui.userprofile.ProfileActivity
 
-class GitHubActivity : AppCompatActivity() {
+const val EXTRA_DATA = "USER_DATA"
+
+class GitHubActivity : AppCompatActivity(), UsersContract.View {
 
     private lateinit var binding: ActivityGitHubBinding
-    private val adapter = GitUsersAdapter()
-    private val usersRepo: UsersRepo = MockUsersRepoImpl()
+    private val adapter = UsersAdapter()
+
+    private lateinit var presenter: UsersContract.Presenter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -21,23 +26,54 @@ class GitHubActivity : AppCompatActivity() {
 
         showProgress(true)
 
-        usersRepo.getUsers(onSuccess = {
-            showProgress(false)
-            adapter.setData(it)
-        }, onError = {
-            showProgress(false)
-            Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
-        })
+        presenter = extractPresenter()
+        presenter = UsersPresenter(app.usersRepo)
+        presenter.onRefresh()
 
         initRecyclerView()
+
+        initActon()
+
+        presenter.attach(this)
+    }
+
+    private fun extractPresenter(): UsersContract.Presenter {
+        return lastCustomNonConfigurationInstance as? UsersContract.Presenter ?: UsersPresenter(app.usersRepo)
     }
 
     private fun initRecyclerView() {
         binding.usersListRecyclerView.adapter = adapter
     }
 
-    private fun showProgress(inProgress: Boolean) {
+    override fun showUsers(users: List<GitUserEntity>) {
+        adapter.setData(users)
+    }
+
+    override fun showError(throwable: Throwable) {
+        Toast.makeText(this, throwable.message, Toast.LENGTH_SHORT).show()
+    }
+
+    override fun showProgress(inProgress: Boolean) {
         binding.progressBar.isVisible = inProgress
         binding.usersListRecyclerView.isVisible = !inProgress
+    }
+
+    private fun initActon() {
+        adapter.listenerClick = UsersAdapter.OnUserClickListener { user ->
+            val intent = Intent(this, ProfileActivity::class.java).apply {
+                putExtra(EXTRA_DATA, user)
+            }
+            startActivity(intent)
+        }
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onRetainCustomNonConfigurationInstance(): UsersContract.Presenter {
+        return presenter
+    }
+
+    override fun onDestroy() {
+        presenter.detach()
+        super.onDestroy()
     }
 }

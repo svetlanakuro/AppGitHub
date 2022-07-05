@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.svetlanakuro.appgithub.domain.entities.GitUserEntity
 
-class GitUsersAdapter : RecyclerView.Adapter<GitUsersViewHolder>() {
+class UsersAdapter : RecyclerView.Adapter<UsersViewHolder>() {
 
     private var data: List<GitUserEntity> = emptyList()
 
@@ -17,11 +17,11 @@ class GitUsersAdapter : RecyclerView.Adapter<GitUsersViewHolder>() {
 
     var listenerClick: OnUserClickListener? = null
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GitUsersViewHolder {
-        return GitUsersViewHolder.create(parent)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UsersViewHolder {
+        return UsersViewHolder.create(parent)
     }
 
-    override fun onBindViewHolder(holder: GitUsersViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: UsersViewHolder, position: Int) {
         holder.bind(getItem(position))
         holder.itemView.setOnClickListener {
             listenerClick?.onUserClick(getItem(position))

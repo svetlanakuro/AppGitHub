@@ -7,13 +7,13 @@ import com.svetlanakuro.appgithub.R
 import com.svetlanakuro.appgithub.databinding.ItemUsersListBinding
 import com.svetlanakuro.appgithub.domain.entities.GitUserEntity
 
-class GitUsersViewHolder(private val binding: ItemUsersListBinding) : RecyclerView.ViewHolder(binding.root) {
+class UsersViewHolder(private val binding: ItemUsersListBinding) : RecyclerView.ViewHolder(binding.root) {
 
     companion object {
 
-        fun create(parent: ViewGroup): GitUsersViewHolder {
+        fun create(parent: ViewGroup): UsersViewHolder {
             val inflater = LayoutInflater.from(parent.context)
-            return GitUsersViewHolder(ItemUsersListBinding.inflate(inflater))
+            return UsersViewHolder(ItemUsersListBinding.inflate(inflater))
         }
     }
 

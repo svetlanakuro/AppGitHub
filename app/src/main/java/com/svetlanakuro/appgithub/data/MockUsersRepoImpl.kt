@@ -78,18 +78,20 @@ class MockUsersRepoImpl : UsersRepo {
         }, DATA_LOADING_FAKE_DELAY)
     }
 
-//    override fun getUsersList(): List<GitUserEntity> {
-//        return mockListUsers
-//    }
-//
-//    override fun getProjectsUser(login: String): List<GitProjectsEntity> {
-//        var userProjects: List<GitProjectsEntity> = emptyList()
-//        mockListUsers.forEach { user ->
-//            if (user.login == login) {
-//                userProjects = user.projectsList!!
-//            }
-//        }
-//        return userProjects
-//    }
+    override fun getProjectsUser(
+        login: String,
+        onSuccess: (List<GitProjectsEntity>) -> Unit,
+        onError: ((Throwable) -> Unit)?
+    ) {
+        var userProjects: List<GitProjectsEntity> = emptyList()
+        mockListUsers.forEach { user ->
+            if (user.login == login) {
+                userProjects = user.projectsList!!
+            }
+        }
+        Handler(Looper.getMainLooper()).postDelayed({
+            onSuccess(userProjects)
+        }, DATA_LOADING_FAKE_DELAY)
+    }
 
 }
