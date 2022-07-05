@@ -1,20 +1,15 @@
 package com.svetlanakuro.appgithub.ui.userslist
 
+import androidx.lifecycle.LiveData
 import com.svetlanakuro.appgithub.domain.entities.GitUserEntity
 
 interface UsersContract {
 
-    interface View {
+    interface ViewModel {
 
-        fun showUsers(users: List<GitUserEntity>)
-        fun showError(throwable: Throwable)
-        fun showProgress(inProgress: Boolean)
-    }
-
-    interface Presenter {
-
-        fun attach(view: View)
-        fun detach()
+        val usersLiveData: LiveData<List<GitUserEntity>>
+        val errorLiveData: LiveData<Throwable>
+        val progressLiveData: LiveData<Boolean>
 
         fun onRefresh()
     }

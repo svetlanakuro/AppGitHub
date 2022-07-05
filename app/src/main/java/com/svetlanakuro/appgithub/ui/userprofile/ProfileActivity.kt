@@ -10,12 +10,12 @@ import com.svetlanakuro.appgithub.databinding.ActivityProfileBinding
 import com.svetlanakuro.appgithub.domain.entities.*
 import com.svetlanakuro.appgithub.ui.userslist.EXTRA_DATA
 
-class ProfileActivity : AppCompatActivity(), ProfileContract.View {
+class ProfileActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityProfileBinding
     private val adapter = UserProjectsAdapter()
 
-    private lateinit var presenter: ProfileContract.Presenter
+    private lateinit var viewModel: ProfileContract.ViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,39 +24,49 @@ class ProfileActivity : AppCompatActivity(), ProfileContract.View {
 
         val user = intent.getParcelableExtra<GitUserEntity>(EXTRA_DATA)!!
 
-        presenter = extractPresenter()
-        presenter = ProfilePresenter(app.usersRepo)
-        presenter.onRefresh(user.login)
-
-        initView(user)
+        initViewModel()
+        initViews(user)
 
         showProgress(true)
-
-        presenter.attach(this)
     }
 
-    private fun extractPresenter(): ProfileContract.Presenter {
-        return lastCustomNonConfigurationInstance as? ProfileContract.Presenter
-            ?: ProfilePresenter(app.usersRepo)
+    private fun initViewModel() {
+        viewModel = extractViewModel()
+        viewModel = ProfileViewModel(app.usersRepo)
+
+        viewModel.progressLiveData.observe(this) { showProgress(it) }
+        viewModel.profileLiveData.observe(this) { showProfile(it) }
+        viewModel.errorLiveData.observe(this) { showError(it) }
     }
 
-    private fun initView(user: GitUserEntity) {
+    private fun extractViewModel(): ProfileContract.ViewModel {
+        return lastCustomNonConfigurationInstance as? ProfileContract.ViewModel
+            ?: ProfileViewModel(app.usersRepo)
+    }
+
+    private fun initViews(user: GitUserEntity) {
+        viewModel.onRefresh(user.login)
         binding.userProfileProjectsRecyclerView.adapter = adapter
         binding.loginUserProfileTextView.text = user.login
         Picasso.get().load(user.avatarUrl).error(R.drawable.ic_baseline_supervised_user_circle_24)
             .into(binding.avatarUserProfileImageView)
     }
 
-    override fun showProfile(userProjects: List<GitProjectsEntity>) {
+    private fun showProfile(userProjects: List<GitProjectsEntity>) {
         adapter.setData(userProjects)
     }
 
-    override fun showError(throwable: Throwable) {
+    private fun showError(throwable: Throwable) {
         Toast.makeText(this, throwable.message, Toast.LENGTH_SHORT).show()
     }
 
-    override fun showProgress(inProgress: Boolean) {
+    private fun showProgress(inProgress: Boolean) {
         binding.progressBar.isVisible = inProgress
         binding.userProfileProjectsRecyclerView.isVisible = !inProgress
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onRetainCustomNonConfigurationInstance(): ProfileContract.ViewModel {
+        return viewModel
     }
 }
