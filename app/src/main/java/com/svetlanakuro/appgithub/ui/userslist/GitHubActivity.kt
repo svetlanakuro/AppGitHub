@@ -10,7 +10,8 @@ import com.svetlanakuro.appgithub.databinding.ActivityGitHubBinding
 import com.svetlanakuro.appgithub.domain.entities.GitUserEntity
 import com.svetlanakuro.appgithub.ui.userprofile.ProfileActivity
 
-const val EXTRA_DATA = "USER_DATA"
+const val EXTRA_LOGIN = "USER_LOGIN"
+const val EXTRA_AVATAR = "USER_AVATAR"
 
 class GitHubActivity : AppCompatActivity() {
 
@@ -63,7 +64,8 @@ class GitHubActivity : AppCompatActivity() {
     private fun initActon() {
         adapter.listenerClick = UsersAdapter.OnUserClickListener { user ->
             val intent = Intent(this, ProfileActivity::class.java).apply {
-                putExtra(EXTRA_DATA, user)
+                putExtra(EXTRA_LOGIN, user.login)
+                putExtra(EXTRA_AVATAR, user.avatarUrl)
             }
             startActivity(intent)
         }

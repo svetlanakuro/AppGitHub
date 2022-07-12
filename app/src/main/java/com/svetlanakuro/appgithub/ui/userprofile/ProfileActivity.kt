@@ -7,8 +7,8 @@ import androidx.core.view.isVisible
 import com.squareup.picasso.Picasso
 import com.svetlanakuro.appgithub.*
 import com.svetlanakuro.appgithub.databinding.ActivityProfileBinding
-import com.svetlanakuro.appgithub.domain.entities.*
-import com.svetlanakuro.appgithub.ui.userslist.EXTRA_DATA
+import com.svetlanakuro.appgithub.domain.entities.GitProjectsEntity
+import com.svetlanakuro.appgithub.ui.userslist.*
 
 class ProfileActivity : AppCompatActivity() {
 
@@ -22,10 +22,11 @@ class ProfileActivity : AppCompatActivity() {
         binding = ActivityProfileBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val user = intent.getParcelableExtra<GitUserEntity>(EXTRA_DATA)!!
+        val userLogin = intent.getStringExtra(EXTRA_LOGIN)!!
+        val userAvatar = intent.getStringExtra(EXTRA_AVATAR)!!
 
         initViewModel()
-        initViews(user)
+        initViews(userLogin, userAvatar)
 
         showProgress(true)
     }
@@ -44,11 +45,11 @@ class ProfileActivity : AppCompatActivity() {
             ?: ProfileViewModel(app.usersRepo)
     }
 
-    private fun initViews(user: GitUserEntity) {
-        viewModel.onRefresh(user.login)
+    private fun initViews(login: String, avatar: String) {
+        viewModel.onRefresh(login)
         binding.userProfileProjectsRecyclerView.adapter = adapter
-        binding.loginUserProfileTextView.text = user.login
-        Picasso.get().load(user.avatarUrl).error(R.drawable.ic_baseline_supervised_user_circle_24)
+        binding.loginUserProfileTextView.text = login
+        Picasso.get().load(avatar).error(R.drawable.ic_baseline_supervised_user_circle_24)
             .into(binding.avatarUserProfileImageView)
     }
 

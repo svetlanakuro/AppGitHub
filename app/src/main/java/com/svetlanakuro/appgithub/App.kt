@@ -4,11 +4,12 @@ import android.app.Application
 import android.content.Context
 import androidx.fragment.app.Fragment
 import com.svetlanakuro.appgithub.data.MockUsersRepoImpl
+import com.svetlanakuro.appgithub.data.retrofit.RetrofitUsersRepoImpl
 import com.svetlanakuro.appgithub.domain.UsersRepo
 
 class App : Application() {
 
-    val usersRepo: UsersRepo by lazy { MockUsersRepoImpl() }
+    val usersRepo: UsersRepo by lazy { RetrofitUsersRepoImpl() }
 }
 
 val Context.app: App get() = applicationContext as App
