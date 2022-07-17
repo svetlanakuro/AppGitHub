@@ -1,20 +1,15 @@
 package com.svetlanakuro.appgithub.ui.userprofile
 
+import androidx.lifecycle.LiveData
 import com.svetlanakuro.appgithub.domain.entities.GitProjectsEntity
 
 interface ProfileContract {
 
-    interface View {
+    interface ViewModel {
 
-        fun showProfile(userProjects: List<GitProjectsEntity>)
-        fun showError(throwable: Throwable)
-        fun showProgress(inProgress: Boolean)
-    }
-
-    interface Presenter {
-
-        fun attach(view: View)
-        fun detach()
+        val profileLiveData: LiveData<List<GitProjectsEntity>>
+        val errorLiveData: LiveData<Throwable>
+        val progressLiveData: LiveData<Boolean>
 
         fun onRefresh(login: String)
     }

@@ -10,50 +10,53 @@ import com.svetlanakuro.appgithub.databinding.ActivityGitHubBinding
 import com.svetlanakuro.appgithub.domain.entities.GitUserEntity
 import com.svetlanakuro.appgithub.ui.userprofile.ProfileActivity
 
-const val EXTRA_DATA = "USER_DATA"
+const val EXTRA_LOGIN = "USER_LOGIN"
+const val EXTRA_AVATAR = "USER_AVATAR"
 
-class GitHubActivity : AppCompatActivity(), UsersContract.View {
+class GitHubActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityGitHubBinding
     private val adapter = UsersAdapter()
 
-    private lateinit var presenter: UsersContract.Presenter
+    private lateinit var viewModel: UsersContract.ViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityGitHubBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        showProgress(true)
-
-        presenter = extractPresenter()
-        presenter = UsersPresenter(app.usersRepo)
-        presenter.onRefresh()
-
-        initRecyclerView()
-
+        initViewModel()
+        initViews()
         initActon()
-
-        presenter.attach(this)
     }
 
-    private fun extractPresenter(): UsersContract.Presenter {
-        return lastCustomNonConfigurationInstance as? UsersContract.Presenter ?: UsersPresenter(app.usersRepo)
+    private fun initViewModel() {
+        viewModel = extractViewModel()
+        viewModel = UsersViewModel(app.usersRepo)
+
+        viewModel.progressLiveData.observe(this) { showProgress(it) }
+        viewModel.usersLiveData.observe(this) { showUsers(it) }
+        viewModel.errorLiveData.observe(this) { showError(it) }
     }
 
-    private fun initRecyclerView() {
+    private fun extractViewModel(): UsersContract.ViewModel {
+        return lastCustomNonConfigurationInstance as? UsersContract.ViewModel ?: UsersViewModel(app.usersRepo)
+    }
+
+    private fun initViews() {
+        viewModel.onRefresh()
         binding.usersListRecyclerView.adapter = adapter
     }
 
-    override fun showUsers(users: List<GitUserEntity>) {
+    private fun showUsers(users: List<GitUserEntity>) {
         adapter.setData(users)
     }
 
-    override fun showError(throwable: Throwable) {
+    private fun showError(throwable: Throwable) {
         Toast.makeText(this, throwable.message, Toast.LENGTH_SHORT).show()
     }
 
-    override fun showProgress(inProgress: Boolean) {
+    private fun showProgress(inProgress: Boolean) {
         binding.progressBar.isVisible = inProgress
         binding.usersListRecyclerView.isVisible = !inProgress
     }
@@ -61,19 +64,15 @@ class GitHubActivity : AppCompatActivity(), UsersContract.View {
     private fun initActon() {
         adapter.listenerClick = UsersAdapter.OnUserClickListener { user ->
             val intent = Intent(this, ProfileActivity::class.java).apply {
-                putExtra(EXTRA_DATA, user)
+                putExtra(EXTRA_LOGIN, user.login)
+                putExtra(EXTRA_AVATAR, user.avatarUrl)
             }
             startActivity(intent)
         }
     }
 
     @Deprecated("Deprecated in Java")
-    override fun onRetainCustomNonConfigurationInstance(): UsersContract.Presenter {
-        return presenter
-    }
-
-    override fun onDestroy() {
-        presenter.detach()
-        super.onDestroy()
+    override fun onRetainCustomNonConfigurationInstance(): UsersContract.ViewModel {
+        return viewModel
     }
 }
