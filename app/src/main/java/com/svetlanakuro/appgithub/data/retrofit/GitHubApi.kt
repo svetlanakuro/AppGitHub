@@ -1,13 +1,14 @@
 package com.svetlanakuro.appgithub.data.retrofit
 
 import com.svetlanakuro.appgithub.domain.entities.*
+import io.reactivex.rxjava3.core.*
 import retrofit2.Call
 import retrofit2.http.*
 
 interface GitHubApi {
 
     @GET("users")
-    fun getListUsers(): Call<List<GitUserEntity>>
+    fun getListUsers(): Single<List<GitUserEntity>>
 
     @GET("users/{user}")
     fun getUserDetail(
@@ -19,5 +20,5 @@ interface GitHubApi {
     fun getListUserProjects(
         @Path("user")
         user: String
-    ): Call<List<GitProjectsEntity>>
+    ): Single<List<GitProjectsEntity>>
 }
