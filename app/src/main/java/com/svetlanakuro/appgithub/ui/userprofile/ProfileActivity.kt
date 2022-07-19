@@ -75,4 +75,9 @@ class ProfileActivity : AppCompatActivity() {
     override fun onRetainCustomNonConfigurationInstance(): ProfileContract.ViewModel {
         return viewModel
     }
+
+    override fun onDestroy() {
+        viewModelDisposable.dispose()
+        super.onDestroy()
+    }
 }
