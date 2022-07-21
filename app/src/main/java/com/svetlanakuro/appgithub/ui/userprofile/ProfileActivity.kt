@@ -9,6 +9,7 @@ import com.svetlanakuro.appgithub.*
 import com.svetlanakuro.appgithub.databinding.ActivityProfileBinding
 import com.svetlanakuro.appgithub.domain.entities.GitProjectsEntity
 import com.svetlanakuro.appgithub.ui.userslist.*
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 
 class ProfileActivity : AppCompatActivity() {
 
@@ -16,6 +17,7 @@ class ProfileActivity : AppCompatActivity() {
     private val adapter = UserProjectsAdapter()
 
     private lateinit var viewModel: ProfileContract.ViewModel
+    private val viewModelDisposable = CompositeDisposable()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,9 +37,12 @@ class ProfileActivity : AppCompatActivity() {
         viewModel = extractViewModel()
         viewModel = ProfileViewModel(app.usersRepo)
 
-        viewModel.progressLiveData.observe(this) { showProgress(it) }
-        viewModel.profileLiveData.observe(this) { showProfile(it) }
-        viewModel.errorLiveData.observe(this) { showError(it) }
+        viewModelDisposable.addAll(
+
+            viewModel.progressLiveData.subscribe { showProgress(it) },
+            viewModel.profileLiveData.subscribe { showProfile(it) },
+            viewModel.errorLiveData.subscribe { showError(it) }
+        )
     }
 
     private fun extractViewModel(): ProfileContract.ViewModel {
@@ -69,5 +74,10 @@ class ProfileActivity : AppCompatActivity() {
     @Deprecated("Deprecated in Java")
     override fun onRetainCustomNonConfigurationInstance(): ProfileContract.ViewModel {
         return viewModel
+    }
+
+    override fun onDestroy() {
+        viewModelDisposable.dispose()
+        super.onDestroy()
     }
 }

@@ -1,29 +1,34 @@
 package com.svetlanakuro.appgithub.ui.userprofile
 
-import androidx.lifecycle.*
 import com.svetlanakuro.appgithub.domain.UsersRepo
 import com.svetlanakuro.appgithub.domain.entities.GitProjectsEntity
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.kotlin.subscribeBy
+import io.reactivex.rxjava3.subjects.*
 
 class ProfileViewModel(
     private val usersRepo: UsersRepo
 ) : ProfileContract.ViewModel {
 
-    override val profileLiveData: LiveData<List<GitProjectsEntity>> = MutableLiveData()
-    override val errorLiveData: LiveData<Throwable> = MutableLiveData()
-    override val progressLiveData: LiveData<Boolean> = MutableLiveData()
+    override val profileLiveData: Observable<List<GitProjectsEntity>> = BehaviorSubject.create()
+    override val errorLiveData: Observable<Throwable> = BehaviorSubject.create()
+    override val progressLiveData: Observable<Boolean> = BehaviorSubject.create()
 
     override fun onRefresh(login: String) {
-        progressLiveData.mutable().postValue(true)
-        usersRepo.getProjectsUser(login, onSuccess = {
-            progressLiveData.mutable().postValue(false)
-            profileLiveData.mutable().postValue(it)
+        progressLiveData
+        usersRepo.getProjectsUser(login).observeOn(AndroidSchedulers.mainThread()).subscribeBy(
+            onSuccess = {
+            progressLiveData.mutable().onNext(false)
+            profileLiveData.mutable().onNext(it)
         }, onError = {
-            progressLiveData.mutable().postValue(false)
-            errorLiveData.mutable().postValue(it)
-        })
+            progressLiveData.mutable().onNext(false)
+            errorLiveData.mutable().onNext(it)
+        }
+        )
     }
 
-    private fun <T> LiveData<T>.mutable(): MutableLiveData<T> {
-        return this as? MutableLiveData<T> ?: throw IllegalStateException("This is not MutableLiveData")
+    private fun <T : Any> Observable<T>.mutable(): Subject<T> {
+        return this as? Subject<T> ?: throw IllegalStateException("This is not MutableLiveData")
     }
 }

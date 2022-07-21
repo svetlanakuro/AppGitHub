@@ -2,55 +2,34 @@ package com.svetlanakuro.appgithub.data.retrofit
 
 import com.svetlanakuro.appgithub.domain.UsersRepo
 import com.svetlanakuro.appgithub.domain.entities.*
-import retrofit2.*
+import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.kotlin.subscribeBy
+import retrofit2.Retrofit
+import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 
 class RetrofitUsersRepoImpl : UsersRepo {
 
     private val retrofit = Retrofit.Builder().baseUrl("https://api.github.com/")
-        .addConverterFactory(GsonConverterFactory.create()).build()
+        .addConverterFactory(GsonConverterFactory.create())
+        .addCallAdapterFactory(RxJava3CallAdapterFactory.create()).build()
     private val api: GitHubApi = retrofit.create(GitHubApi::class.java)
 
     override fun getUsers(onSuccess: (List<GitUserEntity>) -> Unit, onError: ((Throwable) -> Unit)?) {
-        api.getListUsers().enqueue(object : Callback<List<GitUserEntity>> {
-            override fun onResponse(
-                call: Call<List<GitUserEntity>>, response: Response<List<GitUserEntity>>
-            ) {
-                val body = response.body()
-                if (response.isSuccessful && body != null) {
-                    onSuccess.invoke(body)
-                } else {
-                    onError?.invoke(IllegalStateException("Error getting data."))
-                }
-            }
-
-            override fun onFailure(call: Call<List<GitUserEntity>>, t: Throwable) {
-                onError?.invoke(t)
-            }
-
-        })
+        api.getListUsers()
+            .subscribeBy(onSuccess = { onSuccess.invoke(it) }, onError = { onError?.invoke(it) })
     }
+
+    override fun getUsers(): Single<List<GitUserEntity>> = api.getListUsers()
 
     override fun getProjectsUser(
         login: String, onSuccess: (List<GitProjectsEntity>) -> Unit, onError: ((Throwable) -> Unit)?
     ) {
-        api.getListUserProjects(login).enqueue(object : Callback<List<GitProjectsEntity>> {
-            override fun onResponse(
-                call: Call<List<GitProjectsEntity>>, response: Response<List<GitProjectsEntity>>
-            ) {
-                val body = response.body()
-                if (response.isSuccessful && body != null) {
-                    onSuccess.invoke(body)
-                } else {
-                    onError?.invoke(IllegalStateException("Error getting data."))
-                }
-            }
-
-            override fun onFailure(call: Call<List<GitProjectsEntity>>, t: Throwable) {
-                onError?.invoke(t)
-            }
-
-        })
+        api.getListUserProjects(login)
+            .subscribeBy(onSuccess = { onSuccess.invoke(it) }, onError = { onError?.invoke(it) })
     }
+
+    override fun getProjectsUser(login: String): Single<List<GitProjectsEntity>> =
+        api.getListUserProjects(login)
 
 }

@@ -23,6 +23,7 @@ ____
 - ViewBinding;
 - Retrofit;
 - Gson;
-- Picasso.
+- Picasso;
+- RxJava3.
 
 ____

@@ -3,6 +3,7 @@ package com.svetlanakuro.appgithub.data
 import android.os.*
 import com.svetlanakuro.appgithub.domain.UsersRepo
 import com.svetlanakuro.appgithub.domain.entities.*
+import io.reactivex.rxjava3.core.Single
 
 private const val DATA_LOADING_FAKE_DELAY = 2_000L
 
@@ -78,10 +79,10 @@ class MockUsersRepoImpl : UsersRepo {
         }, DATA_LOADING_FAKE_DELAY)
     }
 
+    override fun getUsers(): Single<List<GitUserEntity>> = Single.just(mockListUsers)
+
     override fun getProjectsUser(
-        login: String,
-        onSuccess: (List<GitProjectsEntity>) -> Unit,
-        onError: ((Throwable) -> Unit)?
+        login: String, onSuccess: (List<GitProjectsEntity>) -> Unit, onError: ((Throwable) -> Unit)?
     ) {
         var userProjects: List<GitProjectsEntity> = emptyList()
         mockListUsers.forEach { user ->
@@ -92,6 +93,16 @@ class MockUsersRepoImpl : UsersRepo {
         Handler(Looper.getMainLooper()).postDelayed({
             onSuccess(userProjects)
         }, DATA_LOADING_FAKE_DELAY)
+    }
+
+    override fun getProjectsUser(login: String): Single<List<GitProjectsEntity>> {
+        var userProjects: List<GitProjectsEntity> = emptyList()
+        mockListUsers.forEach { user ->
+            if (user.login == login) {
+                userProjects = user.projectsList!!
+            }
+        }
+        return Single.just(userProjects)
     }
 
 }

@@ -9,6 +9,7 @@ import com.svetlanakuro.appgithub.app
 import com.svetlanakuro.appgithub.databinding.ActivityGitHubBinding
 import com.svetlanakuro.appgithub.domain.entities.GitUserEntity
 import com.svetlanakuro.appgithub.ui.userprofile.ProfileActivity
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 
 const val EXTRA_LOGIN = "USER_LOGIN"
 const val EXTRA_AVATAR = "USER_AVATAR"
@@ -19,6 +20,7 @@ class GitHubActivity : AppCompatActivity() {
     private val adapter = UsersAdapter()
 
     private lateinit var viewModel: UsersContract.ViewModel
+    private val viewModelDisposable = CompositeDisposable()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,9 +36,12 @@ class GitHubActivity : AppCompatActivity() {
         viewModel = extractViewModel()
         viewModel = UsersViewModel(app.usersRepo)
 
-        viewModel.progressLiveData.observe(this) { showProgress(it) }
-        viewModel.usersLiveData.observe(this) { showUsers(it) }
-        viewModel.errorLiveData.observe(this) { showError(it) }
+        viewModelDisposable.addAll(
+
+        viewModel.progressLiveData.subscribe { showProgress(it) },
+        viewModel.usersLiveData.subscribe { showUsers(it) },
+        viewModel.errorLiveData.subscribe { showError(it) }
+        )
     }
 
     private fun extractViewModel(): UsersContract.ViewModel {
@@ -74,5 +79,10 @@ class GitHubActivity : AppCompatActivity() {
     @Deprecated("Deprecated in Java")
     override fun onRetainCustomNonConfigurationInstance(): UsersContract.ViewModel {
         return viewModel
+    }
+
+    override fun onDestroy() {
+        viewModelDisposable.dispose()
+        super.onDestroy()
     }
 }
