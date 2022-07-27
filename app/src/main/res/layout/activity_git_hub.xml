@@ -6,6 +6,17 @@
     android:layout_height="match_parent"
     tools:context=".ui.userslist.GitHubActivity">
 
+    <Button
+        android:id="@+id/rx_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin"
+        android:text="@string/rx_button"
+        app:layout_constraintBottom_toTopOf="@+id/users_list_recycler_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <ProgressBar
         android:id="@+id/progress_bar"
         android:layout_width="wrap_content"
@@ -25,7 +36,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/rx_button"
         app:useCompatPadding="true"
         tools:listitem="@layout/item_users_list" />
 

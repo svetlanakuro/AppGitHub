@@ -1,6 +1,7 @@
 package com.svetlanakuro.appgithub.ui.userslist
 
 import android.content.Intent
+import android.icu.util.Calendar
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -9,6 +10,7 @@ import com.svetlanakuro.appgithub.app
 import com.svetlanakuro.appgithub.databinding.ActivityGitHubBinding
 import com.svetlanakuro.appgithub.domain.entities.GitUserEntity
 import com.svetlanakuro.appgithub.ui.userprofile.ProfileActivity
+import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 
 const val EXTRA_LOGIN = "USER_LOGIN"
@@ -38,10 +40,9 @@ class GitHubActivity : AppCompatActivity() {
 
         viewModelDisposable.addAll(
 
-        viewModel.progressLiveData.subscribe { showProgress(it) },
-        viewModel.usersLiveData.subscribe { showUsers(it) },
-        viewModel.errorLiveData.subscribe { showError(it) }
-        )
+            viewModel.progressLiveData.subscribe { showProgress(it) },
+            viewModel.usersLiveData.subscribe { showUsers(it) },
+            viewModel.errorLiveData.subscribe { showError(it) })
     }
 
     private fun extractViewModel(): UsersContract.ViewModel {
@@ -74,6 +75,17 @@ class GitHubActivity : AppCompatActivity() {
             }
             startActivity(intent)
         }
+
+        binding.rxButton.setOnClickListener {
+            rxButtonActon(Calendar.getInstance().time.toString())
+        }
+    }
+
+    private fun rxButtonActon(message: String) {
+        Observable.just("Hello!").subscribe {
+                Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
+            }
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
     @Deprecated("Deprecated in Java")
