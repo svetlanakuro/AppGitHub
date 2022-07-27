@@ -32,6 +32,9 @@ class GitHubActivity : AppCompatActivity() {
         initViewModel()
         initViews()
         initActon()
+
+        val rxButtonObservable = createButtonClickObservable()
+        rxButtonObservable.subscribe()
     }
 
     private fun initViewModel() {
@@ -76,16 +79,27 @@ class GitHubActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        binding.rxButton.setOnClickListener {
-            rxButtonActon(Calendar.getInstance().time.toString())
-        }
+//        binding.rxButton.setOnClickListener {
+//            rxButtonActon(Calendar.getInstance().time.toString())
+//        }
     }
 
     private fun rxButtonActon(message: String) {
         Observable.just("Hello!").subscribe {
-                Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
-            }
+            Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
+        }
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun createButtonClickObservable(): Observable<String> {
+        return Observable.create { emitter ->
+            binding.rxButton.setOnClickListener {
+                rxButtonActon(Calendar.getInstance().time.toString())
+            }
+            emitter.setCancellable {
+                binding.rxButton.setOnClickListener(null)
+            }
+        }
     }
 
     @Deprecated("Deprecated in Java")
